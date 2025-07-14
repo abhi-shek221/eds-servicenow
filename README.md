@@ -191,6 +191,6 @@ This EMS built on ServiceNow delivers:
 
 ---
 
-## Recommendation
+## Recommended to watch
 
-Include screenshots of table schemas, form layouts, process flows, and Client Script executions for better demonstration.
+IncludeD screenshots of table schemas, form layouts, process flows, and Client Script executions for better demonstration.
