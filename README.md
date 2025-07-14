@@ -1,189 +1,196 @@
-# eds-servicenow
-Educational Management System using ServiceNow
-Project Overview
+# Educational Management System (EMS) on ServiceNow
+
+## Project Overview
+
 The Educational Management System (EMS) is a comprehensive solution crafted on the ServiceNow platform, designed to optimize administrative tasks within educational organizations. EMS facilitates streamlined management of student and faculty data, simplifies admission workflows, and enables academic progress tracking. By leveraging the ServiceNow ecosystem, educational institutions gain a flexible, user-friendly interface backed by automation and data-driven management, promoting operational efficiency and informed decision-making.
 
-ServiceNow Instance Setup
-1. Registering for a Developer Account
-Navigate to the official ServiceNow Developer Portal: https://developer.servicenow.com.
+---
 
-Create a developer profile by submitting the required personal and professional details.
+## ServiceNow Instance Setup
 
-2. Requesting a Developer Instance
-Once logged in, head over to “Manage > Instance”.
+### 1. Registering for a Developer Account
 
-Select “Request Instance” and choose the latest available version.
+- Navigate to the official ServiceNow Developer Portal: [https://developer.servicenow.com](https://developer.servicenow.com).
+- Create a developer profile by submitting the required personal and professional details.
 
-An email containing the instance URL, username, and password will be sent to you.
+### 2. Requesting a Developer Instance
 
-3. Accessing Your Personal Instance
-Visit the instance link provided in the email.
+- Once logged in, head over to **Manage > Instance**.
+- Select **Request Instance** and choose the latest available version.
+- An email containing the instance URL, username, and password will be sent to you.
 
-Log in using the given credentials to start working on your private ServiceNow environment.
+### 3. Accessing Your Personal Instance
 
-Building an Update Set
+- Visit the instance link provided in the email.
+- Log in using the given credentials to start working on your private ServiceNow environment.
+
+---
+
+## Building an Update Set
+
 Update Sets allow for tracking and migrating custom configurations across different ServiceNow environments.
 
-Steps:
+**Steps:**
 
-Go to All > Local Update Sets.
+- Go to **All > Local Update Sets**.
+- Click **New**, name it **Educational Management**, and submit.
+- Use the **Make Current** option to begin capturing configuration changes under this update set.
 
-Click “New”, name it Educational Management and submit.
+---
 
-Use the “Make Current” option to begin capturing configuration changes under this update set.
+## Designing Data Tables
 
-Designing Data Tables
-Salesforce Table (Student Details Repository)
-Path: All > Tables > New
+### Salesforce Table (Student Details Repository)
 
-Label: Salesforce
+- Path: **All > Tables > New**
+- Label: **Salesforce**
+- Fields to add:
+  - **Admin Number**: Display enabled, Extensible checked, Dynamic Default set to “Get Next Padded Number”.
+  - **Grade**: Choice field with values such as Primary, High School, Higher Secondary, etc.
 
-Fields to add:
+### Admission Table (Admission Records)
 
-Admin Number: Display enabled, Extensible checked, Dynamic Default set to “Get Next Padded Number”.
+- Path: **All > Tables > New**
+- Label: **Admission**
+- Extends Table: **Salesforce**
+- Display in application menu: Enabled
+- Important fields:
+  - Admission Number
+  - Grade
+  - School Name
+  - Pincode
+  - Admission Status (choice list)
+  - Purpose of Admission (choice list)
+  - School Area (choice list)
 
-Grade: Choice field with values such as Primary, High School, Higher Secondary, etc.
+---
 
-Admission Table (Admission Records)
-Path: All > Tables > New
+## Customizing Forms
 
-Label: Admission
-
-Extends Table: Salesforce
-
-Display in application menu: Enabled
-
-Important fields:
-
-Admission Number
-
-Grade
-
-School Name
-
-Pincode
-
-Admission Status (choice list)
-
-Purpose of Admission (choice list)
-
-School Area (choice list)
-
-Customizing Forms
 Optimized forms provide a seamless experience when entering or reviewing data.
 
-Salesforce Form: Use System Definition > Tables > Configure > Form Design to structure student details.
+- **Salesforce Form**: Use **System Definition > Tables > Configure > Form Design** to structure student details.
+- **Admission Form**: Repeat the process for the Admission table to organize admission-related fields.
+- **Student Progress Form**: Structure subject-wise academic performance using the Form Design layout.
 
-Admission Form: Repeat the process for the Admission table to organize admission-related fields.
+---
 
-Student Progress Form: Structure subject-wise academic performance using the Form Design layout.
+## Auto Numbering Setup
 
-Auto Numbering Setup
 To automatically generate sequential Admin Numbers:
 
-Navigate to Number Maintenance > New
+- Navigate to **Number Maintenance > New**
+- Example Prefix: `ADM`
+- Format Example: `ADM0001`
+- Submit after configuration.
 
-Example Prefix: ADM
+---
 
-Format Example: ADM0001
+## Automating Process Flows
 
-Submit after configuration.
-
-Automating Process Flows
 Process Flows help visualize and automate the lifecycle of admissions.
 
-Setup:
+**Setup:**
 
-Go to Process Flow > New.
+- Go to **Process Flow > New**.
+- Define stages:
+  - New ➡️ In Progress ➡️ Joined ➡️ Rejected ➡️ Rejoined ➡️ Closed ➡️ Cancelled
+- Save and publish the flow chart.
 
-Define stages:
+---
 
-New ➡️ In Progress ➡️ Joined ➡️ Rejected ➡️ Rejoined ➡️ Closed ➡️ Cancelled
+## Adding Client Scripts for Dynamic Behavior
 
-Save and publish the flow chart.
+### Auto-Filling Admission Details
 
-Adding Client Scripts for Dynamic Behavior
-Auto-Filling Admission Details
-javascript
-Copy
-Edit
+```javascript
 function onChange(control, oldValue, newValue, isLoading, isTemplate) {
-    if (isLoading || newValue == '') return;
-    var admission = g_form.getReference('u_admission_number');
-    g_form.setValue('u_grade', admission.u_grade);
-    g_form.setValue('u_student_name', admission.u_student_name);
+  if (isLoading || newValue == "") return;
+  var admission = g_form.getReference("u_admission_number");
+  g_form.setValue("u_grade", admission.u_grade);
+  g_form.setValue("u_student_name", admission.u_student_name);
 }
-Dynamic Address Fields Based on Pincode
-javascript
-Copy
-Edit
+```
+
+### Dynamic Address Fields Based on Pincode
+
+```javascript
 function onChange(control, oldValue, newValue, isLoading, isTemplate) {
-    if (isLoading || newValue == '') return;
-    var pin = g_form.getValue('u_pincode');
-    if (pin == '509358') {
-        g_form.setValue('u_mandal', 'Kadthal');
-        g_form.setValue('u_city', 'Kadthal');
-        g_form.setValue('u_district', 'Ranga Reddy');
-    }
+  if (isLoading || newValue == "") return;
+  var pin = g_form.getValue("u_pincode");
+  if (pin == "509358") {
+    g_form.setValue("u_mandal", "Kadthal");
+    g_form.setValue("u_city", "Kadthal");
+    g_form.setValue("u_district", "Ranga Reddy");
+  }
 }
-Disabling Manual Entry on Progress Form
-javascript
-Copy
-Edit
+```
+
+### Disabling Manual Entry on Progress Form
+
+```javascript
 function onLoad() {
-    g_form.setDisabled('u_total', true);
-    g_form.setDisabled('u_percentage', true);
-    g_form.setDisabled('u_result', true);
+  g_form.setDisabled("u_total", true);
+  g_form.setDisabled("u_percentage", true);
+  g_form.setDisabled("u_result", true);
 }
-Automated Total Marks Calculation
-javascript
-Copy
-Edit
+```
+
+### Automated Total Marks Calculation
+
+```javascript
 function onChange(control, oldValue, newValue, isLoading, isTemplate) {
-    var total = parseInt(g_form.getValue('u_telugu')) +
-                parseInt(g_form.getValue('u_hindi')) +
-                parseInt(g_form.getValue('u_english')) +
-                parseInt(g_form.getValue('u_maths')) +
-                parseInt(g_form.getValue('u_science')) +
-                parseInt(g_form.getValue('u_social'));
-    g_form.setValue('u_total', total);
+  var total =
+    parseInt(g_form.getValue("u_telugu")) +
+    parseInt(g_form.getValue("u_hindi")) +
+    parseInt(g_form.getValue("u_english")) +
+    parseInt(g_form.getValue("u_maths")) +
+    parseInt(g_form.getValue("u_science")) +
+    parseInt(g_form.getValue("u_social"));
+  g_form.setValue("u_total", total);
 }
-Final Outcome
+```
+
+---
+
+## Final Outcome
+
 This EMS built on ServiceNow delivers:
 
-Centralized administration of student profiles and admission records.
+- Centralized administration of student profiles and admission records.
+- Automation-driven processes that eliminate manual errors.
+- Real-time form updates and validations through Client Scripts.
+- Easy tracking of academic performance and admission stages.
 
-Automation-driven processes that eliminate manual errors.
+---
 
-Real-time form updates and validations through Client Scripts.
+## Benefits
 
-Easy tracking of academic performance and admission stages.
+- Web-based access ensures flexibility from any location.
+- Automates repetitive tasks, saving time and reducing human error.
+- Fully customizable according to institutional requirements.
+- End-to-end management of admissions and student performance.
+- Secure role-based access to sensitive data.
 
-Recommendation: Include screenshots of table schemas, form layouts, process flows, and Client Script executions for better demonstration.
+---
 
-Benefits
-Web-based access ensures flexibility from any location.
+## Challenges
 
-Automates repetitive tasks, saving time and reducing human error.
+- Steeper learning curve for new ServiceNow users.
+- More complex customizations may require additional time investment.
+- Licensing costs may be a barrier for larger-scale deployments.
 
-Fully customizable according to institutional requirements.
+---
 
-End-to-end management of admissions and student performance.
+## Future Enhancements
 
-Secure role-based access to sensitive data.
+- Integration with reporting tools like Tableau or Power BI for data insights.
+- Modules for teacher allocation and scheduling.
+- Mobile app functionality via ServiceNow Mobile Studio.
+- API integrations with third-party educational databases and systems.
 
-Challenges
-Steeper learning curve for new ServiceNow users.
+---
 
-More complex customizations may require additional time investment.
+## Recommendation
 
-Licensing costs may be a barrier for larger-scale deployments.
-
-Future Enhancements
-Integration with reporting tools like Tableau or Power BI for data insights.
-
-Modules for teacher allocation and scheduling.
-
-Mobile app functionality via ServiceNow Mobile Studio.
-
-API integrations with third-party educational databases and systems.
+Include screenshots of table schemas, form layouts, process flows, and Client Script executions for better demonstration.
